@@ -1,6 +1,6 @@
 site_name: 生产环境集群实战
 theme: readthedocs
-nav:
+pages:
 - Homepage: index.md
 #- base:
 #  - dis: base-tech.md
