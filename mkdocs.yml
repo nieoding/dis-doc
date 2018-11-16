@@ -1,5 +1,4 @@
 site_name: 生产环境集群实战
-theme: readthedocs
 nav:
 - Homepage: index.md
 - base:
