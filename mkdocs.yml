@@ -1,16 +1,21 @@
 site_name: 生产环境集群实战
 theme: readthedocs
+markdown_extensions:
+  - codehilite(css_class=code)
+  - admonition
+  - toc:
+      permalink: '#'
 pages:
 - Homepage: index.md
 #- base:
 #  - dis: base-tech.md
 #  - docker: base-docker.md
 #  - vagrant: base-vagrant.md
-- k8s:
-  - bridge: k8s-proxy.md
-  - base: k8s-install.md
-  - sig: k8s-cluster.md
-  - ha: k8s-ha.md
-  - web: k8s-web.md
-- rabbitMQ: rabbitmq.md
-- redis: redis.md
+- 部署k8s集群:
+  - 跳板机: k8s-proxy.md
+  - 构建基础镜像: k8s-install.md
+  - 部署单点集群: k8s-cluster.md
+  - 部署高可用集群: k8s-ha.md
+  - web开发实战: k8s-web.md
+- 部署RabbitMQ集群: rabbitmq.md
+- 部署Redis集群: redis.md
