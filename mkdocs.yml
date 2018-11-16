@@ -1,10 +1,5 @@
 site_name: 生产环境集群实战
 theme: readthedocs
-markdown_extensions:
-  - codehilite(css_class=code)
-  - admonition
-  - toc:
-      permalink: '#'
 pages:
 - Homepage: index.md
 #- base:
