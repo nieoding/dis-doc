@@ -1,1 +1,15 @@
-site_name: My Docs
+site_name: 生产环境集群实战
+theme: readthedocs
+nav:
+- 首页: index.md
+- 基础知识:
+  - 分布式: base-tech.md
+  - docker: base-docker.md
+  - vagrant: base-vagrant.md
+- k8s集群实战:
+  - 跳板机: k8s-proxy.md
+  - 制作基础镜像: k8s-install.md
+  - 单点集群: k8s-cluster.md
+  - 高可用集群: k8s-ha.md
+  - web应用搭建入门: k8s-web.md
+- rabbitMQ集群实战: rabbitmq.md
