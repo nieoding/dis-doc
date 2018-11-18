@@ -1,11 +1,10 @@
 site_name: 生产环境集群实战
 theme: readthedocs
 pages:
-- Homepage: index.md
-#- base:
-#  - dis: base-tech.md
-#  - docker: base-docker.md
-#  - vagrant: base-vagrant.md
+- 分布式理论: index.md
+- 虚拟化:
+  - docker: base-docker.md
+  - vagrant: base-vagrant.md
 - 部署k8s集群:
   - 跳板机: k8s-proxy.md
   - 构建基础镜像: k8s-install.md
