@@ -6,10 +6,43 @@
 
 ![](img/mq_router.jpg)
 
-## 安装
-服务器分别命名mq1, mq2, mq3
+## 配置代理
+> 假设3台服务器都无法访问外网，使用跳板机做访问代理（如果可以访问外网，可以跳过该步骤）
 
 ```
+proxy={proxy_address}
+
+export https_proxy=$proxy
+export http_proxy=$proxy
+```
+
+
+## 安装 & 配置环境
+> 服务器分别命名mq1, mq2, mq3
+
+服务器 | ip
+---|---
+mq1|192.168.0.111
+mq2|192.168.0.112
+mq3|192.168.0.113
+
+下面很多地方会用到hostname来标识节点名称，所以在每台服务器上配置一下hosts
+
+```bash
+mq1=192.168.0.111
+mq2=192.168.0.112
+mq3=192.168.0.113
+
+cat << EOF >> /etc/hosts
+$mq1    mq1
+$mq2    mq2
+$mq3    mq3
+EOF
+```
+
+在每台服务器上安装好rabbitmq-server服务
+
+```bash
 cat << EOF > /etc/yum.repos.d/rabbitmq-erlang.repo
 [rabbitmq-erlang]
 name=rabbitmq-erlang
@@ -20,47 +53,80 @@ repo_gpgcheck=0
 enabled=1
 EOF
 yum install -y socat erlang
-rpm -Uvh https://dl.bintray.com/rabbitmq/all/rabbitmq-server/3.7.7/rabbitmq-server-3.7.7-1.el7.noarch.rpm
-systemctl enable rabbitmq-server
-service rabbitmq-server start
-```
-## 配置 & 调优
 
-```
-username=dingding
-password=dingding1234
+wget https://dl.bintray.com/rabbitmq/all/rabbitmq-server/3.7.7/rabbitmq-server-3.7.7-1.el7.noarch.rpm -O mq.rpm
+rpm -Uvh mq.rpm && rm -f mq.rpm
 
-rabbitmq-plugins enable rabbitmq_management
-rabbitmqctl add_user ${username} ${password}
-rabbitmqctl set_user_tags ${username} administrator
-rabbitmqctl set_permissions -p / ${username} ".*" ".*" ".*"
 mkdir /etc/systemd/system/rabbitmq-server.service.d/
 cat << EOF > /etc/systemd/system/rabbitmq-server.service.d/limits.conf
 [Service]
 LimitNOFILE=300000
 EOF
-systemctl daemon-reload
-service rabbitmq-server restart
-rabbitmqctl cluster_status
+
+systemctl enable rabbitmq-server
+service rabbitmq-server start
+rabbitmq-plugins enable rabbitmq_management
 ```
+
 ## 集群组建
-- 在mq2, mq3上执行
+- 同步cookie
+
+> mq1上执行
+
+```bash
+scp /var/lib/rabbitmq/.erlang.cookie mq2:
+scp /var/lib/rabbitmq/.erlang.cookie mq3:
+```
+
+> mq2, mq3上执行
 
 ```
-mq1=192.168.0.111   # 修改为真实IP
+chown rabbitmq:rabbitmq .erlang.cookie
+chmod 400 .erlang.cookie
+mv -f .erlang.cookie /var/lib/rabbitmq/
+```
 
+- 加入集群
+
+> 在mq2, mq3上执行
+
+```
 rabbitmqctl stop_app
 rabbitmqctl join_cluster rabbit@mq1
 rabbitmqctl start_app
+
+# 验证
+rabbitmqctl cluster_status
 ```
+> rabbitmq的日志存放在`/var/logs/rabbitmq`目录里，如果遇到意外错误，查看日志排查原因
 
 - 设置策略
 
-> 系统默认路由模式，任意节点执行如下代码则切换到集群模式
+> 任意节点执行如下代码则切换到集群模式（如果采用系统默认的路由模式，可以跳过此步）
 
 ```
 rabbitmqctl set_policy ha-all "^" '{"ha-mode":"all"}'
 ```
+
+## 创建用户
+
+> 任意节点执行
+
+```bash
+username=dingding
+password=dingding1234
+
+# 添加用户
+rabbitmqctl add_user ${username} ${password}
+
+# 加入管理员
+rabbitmqctl set_user_tags ${username} administrator
+
+# 对根目录设置消费权限
+rabbitmqctl set_permissions -p / ${username} ".*" ".*" ".*"
+
+```
+
 
 ## LB
 建议将mq1, mq2, mq3写在 /etc/hosts里面

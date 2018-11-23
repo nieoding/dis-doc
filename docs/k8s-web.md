@@ -123,7 +123,7 @@ ingress-nginx   NodePort   10.111.207.114   <none>        80:30866/TCP,443:32360
 [root@master ~]# curl http://192.168.0.153:30866/helloworld/
 <h1>Hello World!</h1>
 ```
-> 192.168.0.153是nginx-ingress-controller所在节点的IP地址
+> 192.168.0.153是集群内任意节点的IP地址
 
 ## 创建LB
 - 创建负载均衡
@@ -142,6 +142,6 @@ ingress-nginx   NodePort   10.111.207.114   <none>        80:30866/TCP,443:32360
 实际生产环境的小技巧：
 > 1. ingress-controller重启，nodeport是会变的，真正的生成环境我们需要将端口固定住；
 >
-> 2. ingress-controller重启，节点也是会变的，我们需要通过给node加标签来固定；
+> 2. 有时候我们会需要把某些pod限制在某几个指定节点上，我们需要通过给node加标签来固定；
 > 
 > 3. 牵涉到与微信开放平台通讯时，那边会需要咱们固定IP访问接口，这种情况下我们不光要把负责通讯的应用固定在指定节点上，指定节点也要分配固定的弹性IP。

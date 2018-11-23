@@ -55,3 +55,16 @@ service privoxy start
 # 验证
 curl -x 127.0.0.1:8118 http://httpbin.org/ip
 ```
+
+> wget, curl 使用代理的方法
+
+```bash
+# 全局代理
+export http_proxy={proxy_address}
+export https_proxy={proxy_address}
+
+# 或者程序代理
+wget -e https_proxy={proxy_address} {your_https_url}
+wget -e http_proxy={proxy_address} {your_http_url}
+curl -x {proxy_address} {your_url}
+```
